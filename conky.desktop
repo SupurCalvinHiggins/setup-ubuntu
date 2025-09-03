@@ -1,0 +1,4 @@
+[Desktop Entry]
+Name=conky
+Exec=conky -c /home/calvin/.conky/conky/conky.conf
+Type=Application
