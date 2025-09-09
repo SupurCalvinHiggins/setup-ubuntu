@@ -26,6 +26,10 @@ sudo snap install discord zoom slack
 
 ### tools
 
+# bashrc
+git clone https://github.com/SupurCalvinHiggins/bashrc tmp
+cp tmp/bashrc/.bashrc ~/.bashrc
+
 # python
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
@@ -46,8 +50,11 @@ sudo snap install code --classic
 wget -O tmp/nvim.tar.gz "https://github.com/neovim/neovim/releases/download/v0.11.2/nvim-linux-x86_64.tar.gz"
 tar xzvf tmp/nvim.tar.gz -C /opt
 sudo apt install ripgrep npm nodejs
+git clone https://github.com/SupurCalvinHiggins/nvim ~/.config/nvim
 
 # TODO: Set font to JetBrainsMono in terminal preferences.
 # TODO: Install Chrome.
 # TODO: Set wallpaper.
 # TODO: Configure SSH keys.
+# TODO: GCM.
+# TODO: Disable ads in Firefox.
