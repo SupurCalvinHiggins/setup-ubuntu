@@ -1,0 +1,23 @@
+services:
+  claude:
+    build: .
+    image: claude-sandbox
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    command: sleep infinity
+    environment:
+      DOCKER_HOST: tcp://dind:2375
+    volumes:
+      - ${HOME}/.config/claude-sandbox/.claude:/home/node/.claude
+      - ${PROJECT_DIR:-.}:/workspace/${PROJECT_NAME:-default}
+    working_dir: /workspace/${PROJECT_NAME:-default}
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    depends_on: [dind]
+
+  dind:
+    image: docker:dind
+    runtime: sysbox-runc
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    volumes:
+      - ${PROJECT_DIR:-.}:/workspace/${PROJECT_NAME:-default}

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+export PROJECT_DIR="$PWD" PROJECT_NAME="$(basename "$PWD")"
+export HOST_UID="$(id -u)" HOST_GID="$(id -g)"
+f=~/.config/claude-sandbox/compose.yml
+docker compose -f "$f" -p "$PROJECT_NAME" up -d
+state=~/.config/claude-sandbox/.claude/projects
+enc=$(echo "/workspace/$PROJECT_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
+args=()
+ls "$state/$enc"/*.jsonl >/dev/null 2>&1 && args=(--continue)
+docker compose -f "$f" -p "$PROJECT_NAME" exec claude claude "${args[@]}" "$@"
