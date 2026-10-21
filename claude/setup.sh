@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+mkdir -p ~/bin
 cp ./claude ~/bin/claude
 mkdir -p ~/.config/claude-sandbox
 cp ./Dockerfile ~/.config/claude-sandbox/

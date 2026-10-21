@@ -17,6 +17,7 @@ services:
   dind:
     image: docker:dind
     runtime: sysbox-runc
+    security_opt: [no-new-privileges:true]
     environment:
       DOCKER_TLS_CERTDIR: ""
     volumes:
