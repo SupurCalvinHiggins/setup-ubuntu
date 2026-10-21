@@ -1,11 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
-export PROJECT_DIR="$PWD" PROJECT_NAME="$(basename "$PWD")"
+
+cmd=${1:-}; shift || true
+dir=$PWD
+if [[ -d ${1:-} ]]; then dir=$(realpath "$1"); shift; fi
+
+export PROJECT_DIR="$dir" PROJECT_NAME="$(basename "$dir")"
 export HOST_UID="$(id -u)" HOST_GID="$(id -g)"
 f=~/.config/claude-sandbox/compose.yml
-docker compose -f "$f" -p "$PROJECT_NAME" up -d
-state=~/.config/claude-sandbox/.claude/projects
-enc=$(echo "/workspace/$PROJECT_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
-args=()
-ls "$state/$enc"/*.jsonl >/dev/null 2>&1 && args=(--continue) || true
-docker compose -f "$f" -p "$PROJECT_NAME" exec claude claude "${args[@]}" "$@"
+proj=$(echo "$PROJECT_NAME" | tr 'A-Z' 'a-z' | tr -c 'a-z0-9_\n-' '-')
+dc() { docker compose -f "$f" -p "$proj" "$@"; }
+
+case $cmd in
+  up)
+    dc up -d
+    state=~/.config/claude-sandbox/.claude/projects
+    enc=$(echo "/workspace/$PROJECT_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
+    args=()
+    ls "$state/$enc"/*.jsonl >/dev/null 2>&1 && args=(--continue) || true
+    dc exec claude claude "${args[@]}" "$@"
+    ;;
+  down)
+    dc down
+    ;;
+  *)
+    echo "usage: claude up|down [path] [claude args]" >&2
+    exit 1
+    ;;
+esac
