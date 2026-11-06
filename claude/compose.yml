@@ -22,3 +22,7 @@ services:
       DOCKER_TLS_CERTDIR: ""
     volumes:
       - ${PROJECT_DIR:-.}:/workspace/${PROJECT_NAME:-default}
+
+networks:
+  default:
+    name: claude-sandbox-${PROJECT_NAME:-default}
