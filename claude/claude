@@ -3,7 +3,7 @@ set -euo pipefail
 
 cmd=${1:-}; shift || true
 dir=$PWD
-if [[ -d ${1:-} ]]; then dir=$(realpath "$1"); shift; fi
+if [[ $cmd != snapshot && -d ${1:-} ]]; then dir=$(realpath "$1"); shift; fi
 
 export PROJECT_DIR="$dir" PROJECT_NAME="$(basename "$dir")"
 export HOST_UID="$(id -u)" HOST_GID="$(id -g)"
@@ -17,14 +17,23 @@ case $cmd in
     state=~/.config/claude-sandbox/.claude/projects
     enc=$(echo "/workspace/$PROJECT_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
     args=()
-    ls "$state/$enc"/*.jsonl >/dev/null 2>&1 && args=(--continue) || true
+    ls "$state/$enc"/*.jsonl >/dev/null 2>&1 && args=(--resume) || true
     dc exec claude claude "${args[@]}" "$@"
     ;;
   down)
     dc down
     ;;
+  snapshot)
+    [[ -n ${1:-} ]] || { echo "usage: claude snapshot <path>" >&2; exit 1; }
+    src=$(realpath "$1")
+    name=$(basename "$src")
+    cid=$(dc ps -q claude)
+    [[ -n $cid ]] || { echo "claude session not up for this project (run: claude up)" >&2; exit 1; }
+    dc exec claude mkdir -p /workspace/snapshots
+    docker cp "$src/." "$cid:/workspace/snapshots/$name"
+    ;;
   *)
-    echo "usage: claude up|down [path] [claude args]" >&2
+    echo "usage: claude up|down|snapshot [path] [claude args]" >&2
     exit 1
     ;;
 esac
